@@ -58,6 +58,7 @@ function CreateNewEmployee() {
     surname: '',
     department: '',
     exists: '',
+    api: '',
   });
 
   const regex = /^[a-zA-Z]{2,255}$/;
@@ -86,7 +87,7 @@ function CreateNewEmployee() {
         emp.surname.toLowerCase() === surname.toLowerCase()
     );
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     const nameErr = validateField('name', name);
@@ -98,11 +99,19 @@ function CreateNewEmployee() {
       return;
     }
 
-    setErrors({ name: nameErr, surname: surnameErr, department: departmentErr, exists: '' });
+    setErrors({ name: nameErr, surname: surnameErr, department: departmentErr, exists: '', api: '' });
 
     if (!nameErr && !surnameErr && !departmentErr) {
-      dispatch(createEmployee(name, surname, departmentId));
-      navigate(-1);
+      try {
+        await dispatch(createEmployee({ name, surname, department: departmentId }));
+        navigate(-1);
+      } catch (err) {
+        // Affiche l’erreur côté formulaire si l’API échoue
+        setErrors(prev => ({
+          ...prev,
+          api: err.response?.data?.message || 'Error creating employee',
+        }));
+      }
     }
   };
 
@@ -117,7 +126,7 @@ function CreateNewEmployee() {
                 <Form.Label>Name</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Entrer le nom de l'employée "
+                  placeholder="Entrer le nom de l'employée"
                   value={name}
                   onChange={e => setName(e.target.value)}
                   onBlur={() => setErrors({ ...errors, name: validateField('name', name) })}
@@ -146,9 +155,7 @@ function CreateNewEmployee() {
             <Form.Select
               value={departmentId}
               onChange={e => setDepartmentId(e.target.value)}
-              onBlur={() =>
-                setErrors({ ...errors, department: validateField('department', departmentId) })
-              }
+              onBlur={() => setErrors({ ...errors, department: validateField('department', departmentId) })}
             >
               <option value="">Selectionner un departement</option>
               {departments.map(dep => (
@@ -161,12 +168,20 @@ function CreateNewEmployee() {
           </Form.Group>
 
           {errors.exists && <ErrorText>{errors.exists}</ErrorText>}
+          {errors.api && <ErrorText>{errors.api}</ErrorText>}
 
           <div className="d-flex justify-content-end mt-3">
             <StyledButton
               type="submit"
               variant="success"
-              disabled={errors.name || errors.surname || errors.department || !name || !surname || !departmentId}
+              disabled={
+                errors.name ||
+                errors.surname ||
+                errors.department ||
+                !name ||
+                !surname ||
+                !departmentId
+              }
             >
               Create
             </StyledButton>

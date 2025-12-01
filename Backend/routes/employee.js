@@ -1,38 +1,15 @@
+// routes/employee.js
 const express = require('express');
-const employeeRouter = express.Router();
-const employeeController = require('../controllers/employee.controller.js');
+const router = express.Router();
+const employeeController = require('../controllers/employee.controller');
+const authMiddleware = require('../middlewares/auth.middleware');
 
-employeeRouter.get('/', async (req, res) => {
-    await employeeController.findAll(res);
-});
+router.use(authMiddleware); // protège toutes les routes
 
-employeeRouter.get('/:id', async (req, res) => {
-    const id = req.params.id;
+router.get('/', employeeController.findAll);
+router.get('/:id', employeeController.findOne);
+router.post('/', employeeController.create);
+router.put('/:id', employeeController.update);
+router.delete('/:id', employeeController.delete);
 
-    await employeeController.findOne(id, res);
-});
-
-employeeRouter.post('/', async (req, res) => {
-    const name = req.body.name;
-    const surname = req.body.surname;
-    const departmentId = req.body.departmentId;
-
-    await employeeController.create(name, surname, departmentId, res);
-});
-
-employeeRouter.put('/:id', async (req, res) => {
-    const id = req.params.id;
-    const name = req.body.name;
-    const surname = req.body.surname;
-    const departmentId = req.body.departmentId;
-
-    await employeeController.update(id, name, surname, departmentId, res);
-});
-
-employeeRouter.delete('/:id', async (req, res) => {
-    const id = req.params.id;
-
-    await employeeController.delete(id, res);
-});
-
-module.exports = employeeRouter;
+module.exports = router;

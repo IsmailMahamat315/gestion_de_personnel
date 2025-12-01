@@ -1,3 +1,4 @@
+// app.js
 const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -6,6 +7,7 @@ const cors = require('cors');
 const connectDb = require('./config/db');
 const departmentRouter = require('./routes/department');
 const employeeRouter = require('./routes/employee');
+const authRouter = require('./routes/auth'); // ← Ajoutez cette ligne
 const databaseSeeder = require('./seeders/databaseSeeder');
 
 const app = express();
@@ -20,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', departmentRouter);
 app.use('/api/employees', employeeRouter);
+app.use('/api/auth', authRouter); // ← Ajoutez cette ligne
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

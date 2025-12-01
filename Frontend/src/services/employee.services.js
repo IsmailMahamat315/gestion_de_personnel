@@ -5,24 +5,13 @@ class EmployeeService {
     return http.get("/employees");
   }
 
-  create(name, surname, departmentId) {
-    let data = {
-      name: name,
-      surname: surname,
-      departmentId: departmentId
-    };
-
-    return http.post("/employees", data);
+  create(employeeData) {
+    // employeeData doit contenir: { name, surname, email, password, role, department }
+    return http.post("/employees", employeeData);
   }
 
-  update(id, name, surname, departmentId) {
-    let data = {
-      name: name,
-      surname: surname,
-      departmentId: departmentId
-    };
-
-    return http.put(`/employees/${id}`, data);
+  update(id, employeeData) {
+    return http.put(`/employees/${id}`, employeeData);
   }
 
   delete(id) {
